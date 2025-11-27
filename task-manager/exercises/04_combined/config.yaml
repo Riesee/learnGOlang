@@ -1,0 +1,7 @@
+app:
+  name: "My Combined App"
+  version: "1.0.0"
+  env: "development"
+
+server:
+  port: "3002"

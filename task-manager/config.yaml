@@ -1,0 +1,28 @@
+# Task Manager Configuration
+# Bu dosya Viper tarafından okunur
+# Environment variable'lar bu değerleri override eder
+
+app:
+  name: task-manager
+  env: development  # development | production
+
+server:
+  port: "3000"
+
+database:
+  host: localhost
+  port: "5432"
+  user: postgres
+  password: postgres
+  dbname: taskmanager
+  sslmode: disable
+
+jwt:
+  secret: "super-secret-key-change-in-production"
+  expireHour: 24
+
+redis:
+  host: localhost
+  port: "6379"
+  password: ""
+  db: 0

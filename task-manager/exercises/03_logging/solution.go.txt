@@ -1,0 +1,65 @@
+// ============================================
+// ÇÖZÜM
+// ============================================
+
+package main
+
+import (
+	"go.uber.org/zap"
+)
+
+func main() {
+	// GÖREV 2: Development logger oluştur
+	logger, _ := zap.NewDevelopment()
+
+	// GÖREV 3: Sugar logger (daha kolay kullanım)
+	sugar := logger.Sugar()
+
+	// GÖREV 4: Farklı seviyelerde log
+	sugar.Debug("Debug mesajı")
+	sugar.Info("Info mesajı")
+	sugar.Warn("Uyarı mesajı")
+	sugar.Error("Hata mesajı")
+
+	// GÖREV 5: Structured logging (key-value çiftleri)
+	sugar.Infow("Kullanıcı girişi",
+		"user_id", 123,
+		"email", "test@test.com",
+		"ip", "192.168.1.1",
+	)
+
+	// Hata örneği
+	sugar.Errorw("Database bağlantı hatası",
+		"host", "localhost",
+		"port", 5432,
+		"retry_count", 3,
+	)
+
+	// GÖREV 6: Buffer'ı flush et
+	logger.Sync()
+}
+
+// ============================================
+// AÇIKLAMALAR:
+// ============================================
+//
+// zap.NewDevelopment() vs zap.NewProduction()
+// -------------------------------------------
+// Development: Renkli, okunabilir, Debug dahil
+// Production:  JSON format, Debug hariç, daha hızlı
+//
+// logger vs sugar
+// ---------------
+// logger.Info("msg", zap.String("key", "val"))  → Daha hızlı, tip güvenli
+// sugar.Infow("msg", "key", "val")              → Daha kolay, biraz yavaş
+//
+// Infow vs Info
+// -------------
+// sugar.Info("mesaj")                    → Sadece mesaj
+// sugar.Infow("mesaj", "key", "value")   → Mesaj + fields (w = with)
+//
+// logger.Sync() neden gerekli?
+// ----------------------------
+// Zap log'ları buffer'a yazar (performans için)
+// Sync() buffer'ı flush eder, hiçbir log kaybolmaz
+// ============================================

@@ -1,0 +1,16 @@
+# Config dosyası
+# Viper bu dosyayı okuyacak
+
+app:
+  name: "Task Manager"
+  debug: true
+  version: "1.0.0"
+
+server:
+  port: "3000"
+  host: "localhost"
+
+database:
+  host: "localhost"
+  port: "5432"
+  name: "taskdb"
