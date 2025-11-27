@@ -99,7 +99,7 @@ func main() {
 
 	var singleTask Task
 
-	db.First(&singleTask, 6)
+	db.First(&singleTask, 8)
 
 	db.Model(&singleTask).Updates(Task{Title: "Yeni başlık", Completed: true})
 	// GÖREV 8: READ - Tek task getir (ID ile)
@@ -109,22 +109,26 @@ func main() {
 	fmt.Println("Task güncellendi!")
 
 	// GÖREV 10: DELETE - Task sil (soft delete)
+	var deleteTask Task
+	db.First(&deleteTask, 7)
 
-	db.Delete(&singleTask)
+	db.Delete(&deleteTask)
 
 	fmt.Println("Task silindi!")
-
-	db.Where("completed = ?", true).Find(&tasks)
-	fmt.Println("Tamamlanmış tasklar:")
-	for _, task := range tasks {
-		fmt.Printf("- %d: %s\n", task.ID, task.Title)
-	}
 
 	// ============================================
 	// BONUS: WHERE ile sorgulama
 	// ============================================
-	// db.Where("completed = ?", true).Find(&tasks)
-	// db.Where("title LIKE ?", "%Go%").Find(&tasks)
+	var completedTasks []Task
+	db.Where("completed = ?", true).Find(&completedTasks)
+	fmt.Printf("Tamamlanan task sayısı: %d\n", len(completedTasks))
+
+	var searchTasks []Task
+	db.Where("title LIKE ?", "%Go%").Find(&searchTasks)
+	fmt.Println("'Go' içeren tasklar:")
+	for _, t := range searchTasks {
+		fmt.Printf("- %s\n", t.Title)
+	}
 }
 
 // ============================================
