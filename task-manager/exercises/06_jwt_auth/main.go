@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -109,15 +111,13 @@ func register(c *gin.Context) {
 	}
 
 	// GÖREV: Şifreyi hash'le
-	// İpucu: bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	// BURAYA KOD YAZ
-	hashedPassword := "" // Bu satırı değiştir
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 
 	// 3. User oluştur ve kaydet
 	user := User{
 		ID:       nextUserID,
 		Email:    req.Email,
-		Password: hashedPassword,
+		Password: string(hashedPassword),
 		Name:     req.Name,
 	}
 	users = append(users, user)
@@ -143,12 +143,30 @@ func login(c *gin.Context) {
 		return
 	}
 
+	for _, user := range users {
+		if user.Email == req.Email {
+			err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+			if err != nil {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Geçersiz Şifre"})
+				return
+			}
+			token, _ := generateToken(user)
+			c.JSON(http.StatusOK, AuthResponse{
+				Token: token,
+				User:  user,
+			})
+			return
+		} else {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Geçersiz email"})
+			return
+		}
+	}
+
 	// GÖREV: Kullanıcıyı bul ve şifreyi doğrula
 	// 1. users içinde email'e göre ara
 	// 2. bcrypt.CompareHashAndPassword ile şifre kontrolü
 	// 3. Doğruysa token oluştur ve döndür
 	// 4. Yanlışsa 401 Unauthorized döndür
-	// BURAYA KOD YAZ
 
 	c.JSON(http.StatusUnauthorized, gin.H{"error": "Geçersiz email veya şifre"})
 }
@@ -200,16 +218,28 @@ func AuthMiddleware() gin.HandlerFunc {
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
 		// GÖREV: Token'ı parse et ve doğrula
-		// İpucu:
-		// claims := &Claims{}
-		// token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
-		//     return jwtSecret, nil
-		// })
-		// BURAYA KOD YAZ
 
-		// Geçici olarak geç (bunu sil ve yukarıdaki kodu yaz)
-		_ = tokenString
-		c.Next()
+		claims := &Claims{}
+		userExist := false
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
+			return jwtSecret, nil
+		})
+
+		for _, user := range users {
+			if user.ID == claims.UserID {
+				userExist = true
+				break
+			}
+		}
+
+		if err != nil || !token.Valid || !userExist {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Gecersiz token"})
+			c.Abort()
+			return
+		} else {
+			c.Set("userID", claims.UserID)
+			c.Next()
+		}
 	}
 }
 

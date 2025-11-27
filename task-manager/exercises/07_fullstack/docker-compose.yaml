@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: go_fullstack
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fullstackdb
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # pgAdmin - Web UI ile database yönetimi
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: go_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"   # localhost:5050'de açılacak
+    depends_on:
+      - postgres
+
+  redis:
+    image: redis:7
+    container_name: go_redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:

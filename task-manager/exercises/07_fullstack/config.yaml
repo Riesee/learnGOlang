@@ -1,0 +1,23 @@
+app:
+  name: "My Fullstack App"
+  version: "1.0.0"
+  env: "development"
+
+server:
+  port: "3004"
+
+database:
+  host: "localhost"
+  port: "5433"
+  user: "postgres"
+  password: "postgres"
+  dbname: "fullstackdb"
+  sslmode: "disable"
+
+jwt:
+  secret: "super-secret-key"
+  expireHour: 24
+
+redis:
+  host: "localhost"
+  port: "6379"
