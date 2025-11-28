@@ -1,0 +1,23 @@
+# User GraphQL şeması
+
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  createdAt: Time
+  updatedAt: Time
+  tasks: [Task!]!
+}
+
+# Query'leri genişlet
+extend type Query {
+  """
+  Tüm kullanıcıları getir
+  """
+  users: [User!]!
+  
+  """
+  ID ile tek kullanıcı getir
+  """
+  user(id: ID!): User
+}

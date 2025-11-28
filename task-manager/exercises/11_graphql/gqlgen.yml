@@ -1,0 +1,35 @@
+# gqlgen configuration
+# Örnek projedeki yapıya benzer
+
+# Schema dosyaları
+schema:
+  - graph/*.graphqls
+
+# Generated kod
+exec:
+  filename: graph/generated/generated.go
+  package: generated
+
+# Model'ler
+model:
+  filename: graph/model/models_gen.go
+  package: model
+
+# Resolver'lar
+resolver:
+  layout: follow-schema
+  dir: graph/resolverfn
+  package: resolverfn
+  filename_template: "{name}.resolvers.go"
+
+# Tip eşlemeleri
+models:
+  ID:
+    model:
+      - github.com/99designs/gqlgen/graphql.ID
+      - github.com/99designs/gqlgen/graphql.Int
+      - github.com/99designs/gqlgen/graphql.Int64
+  Int:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int
+      - github.com/99designs/gqlgen/graphql.Int64

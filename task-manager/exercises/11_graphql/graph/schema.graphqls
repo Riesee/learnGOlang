@@ -1,0 +1,16 @@
+# Temel GraphQL şeması
+# Örnek projedeki schema.graphqls gibi
+
+# Scalar tipler (özel tipler)
+scalar Time
+
+# Ana Query ve Mutation tanımları
+# Diğer dosyalarda "extend" ile genişletilir
+
+type Query {
+  ping: String!
+}
+
+type Mutation {
+  ping: String!
+}

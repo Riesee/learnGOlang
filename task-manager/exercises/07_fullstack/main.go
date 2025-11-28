@@ -8,6 +8,8 @@ import (
 	"fullstack/internal/logger"
 	"fullstack/internal/middleware"
 	"fullstack/internal/model"
+	"fullstack/internal/service"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,9 +51,14 @@ func main() {
 	r.POST("/login", handler.Login(db, []byte(cfg.JWT.Secret)))
 	r.POST("/register", handler.Register(db, []byte(cfg.JWT.Secret)))
 
+	r.GET("/slow", func(c *gin.Context) {
+		time.Sleep(5 * time.Second)
+		c.JSON(200, gin.H{"message": "Yavaş cevap geldi!"})
+	})
 	// Protected Routes
 	protected := r.Group("/")
 	protected.Use(middleware.AuthMiddleware(db, []byte(cfg.JWT.Secret)))
+	protected.Use(middleware.RateLimitMiddleware(20, time.Minute))
 	{
 		protected.GET("/tasks", handler.GetTasks(db))
 		protected.POST("/tasks", handler.PostTask(db))
@@ -60,5 +67,8 @@ func main() {
 		protected.DELETE("/tasks/:id", handler.DeleteTask(db))
 	}
 
+	service.SendNotificationToMany([]uint{1, 2, 3,4,5,6,7}, "Merhaba")
 	r.Run(":" + cfg.Server.Port)
+	
+
 }

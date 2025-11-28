@@ -1,0 +1,57 @@
+# Task GraphQL şeması
+# Örnek projedeki user.graphqls gibi ayrı dosyada
+
+# Task tipi
+type Task {
+  id: ID!
+  title: String!
+  description: String
+  completed: Boolean!
+  userId: ID!
+  createdAt: Time
+  updatedAt: Time
+  user: User
+}
+
+# Input tipi (mutation'lar için)
+input CreateTaskInput {
+  title: String!
+  description: String
+}
+
+input UpdateTaskInput {
+  title: String
+  description: String
+  completed: Boolean
+}
+
+# Query'leri genişlet
+extend type Query {
+  """
+  Tüm taskları getir
+  """
+  tasks: [Task!]!
+  
+  """
+  ID ile tek task getir
+  """
+  task(id: ID!): Task
+}
+
+# Mutation'ları genişlet
+extend type Mutation {
+  """
+  Yeni task oluştur
+  """
+  createTask(input: CreateTaskInput!): Task!
+  
+  """
+  Task güncelle
+  """
+  updateTask(id: ID!, input: UpdateTaskInput!): Task!
+  
+  """
+  Task sil
+  """
+  deleteTask(id: ID!): Boolean!
+}
