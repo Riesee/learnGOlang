@@ -26,7 +26,7 @@ func main() {
 	}
 
 	time.Sleep(2 * time.Second)
-	cancel()
+	defer cancel()
 	fmt.Println("\n--- İptal ediliyor ---")
 	time.Sleep(500 * time.Millisecond)
 	fmt.Println("\n--- İptal edildi ---")
