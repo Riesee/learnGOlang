@@ -1,0 +1,13 @@
+app:
+  name: "website-checker"
+  log_level: "info"
+  env: "development"
+
+monitor:
+  url: "https://altin.in/"
+  selector: "[title='Gram Altın - Alış']"
+  interval: 5s
+
+redis:
+  host: "localhost"
+  port: 6379

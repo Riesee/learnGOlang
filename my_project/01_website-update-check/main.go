@@ -1,15 +1,46 @@
 package main
 
 import (
-	"log"
+	"context"
+	"os"
+	"os/signal"
+	"syscall"
 
-	"website-checker/fetch"
+	"website-checker/config"
+	"website-checker/logger"
+	"website-checker/monitor"
 )
 
 func main() {
-	doc,err := fetch.Get("https://google.com")
+	logger.Init("development")
+	defer logger.Sync()
+	cfg, err := config.Load()
 	if err != nil {
-		log.Fatal(err) // geçici olarak fatal ekledim
-	}
-	log.Println(doc)
+        logger.Fatal("Config yüklenemedi:", err)
+    }
+	logger.Init(cfg.App.Env)
+
+
+	logger.Info("Uygulama baslatiliyor",
+		"env", cfg.App.Env,
+		"interval", cfg.Monitor.Interval,
+	)
+
+    
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+        sig := <-sigChan
+        logger.Info("Signal alındı:", sig)
+        cancel()
+    }()
+
+	
+	m := monitor.New(cfg.Monitor.URL, cfg.Monitor.Interval, cfg.Monitor.Selector)
+	m.Start(ctx)
+	logger.Info("Uygulama kapatıldı")
 }
